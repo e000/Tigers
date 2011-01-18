@@ -20,3 +20,19 @@ class Tiger(IRCClient):
         self._attemptedNick = self.factory.mkNick()
         self.hookEngine(irc.ERR_NICKNAMEINUSE, self.nickname, self._attemptedNick)
         self.setNick(self._attemptedNick)
+        
+class TigerFactory(protocol.ClientFactory):
+    protocol = Tiger
+    
+    def __init__(self, controller):
+        self.controller = controller
+        self.defered = defer.Defered()
+        self.deadDefered = defer.Defered()
+        
+    def buildProtocol(self, addr):
+        client = self.protocol(self)
+        
+        self.defered.callback(client)
+        
+        return client
+        
